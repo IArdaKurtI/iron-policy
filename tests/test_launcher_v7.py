@@ -125,3 +125,52 @@ def test_loading_screen_is_shown_before_ai_modules_are_imported() -> None:
     assert source.index("\nshow_startup_screen()\n") < source.index(
         "from tank_v7.environment import"
     )
+
+
+def test_language_setting_is_saved_and_loaded_outside_project(tmp_path) -> None:
+    settings = tmp_path / "user-settings" / "settings.json"
+
+    assert launcher_v7.load_language(settings) is None
+    assert launcher_v7.save_language("en", settings) is True
+    assert launcher_v7.load_language(settings) == "en"
+    assert json.loads(settings.read_text(encoding="utf-8")) == {"language": "en"}
+    assert launcher_v7.ROOT not in launcher_v7.SETTINGS_PATH.parents
+
+
+def test_invalid_or_corrupt_language_setting_asks_again(tmp_path) -> None:
+    settings = tmp_path / "settings.json"
+    settings.write_text('{"language": "de"}', encoding="utf-8")
+    assert launcher_v7.load_language(settings) is None
+    settings.write_text("not-json", encoding="utf-8")
+    assert launcher_v7.load_language(settings) is None
+    with pytest.raises(ValueError, match="tr or en"):
+        launcher_v7.save_language("de", settings)
+
+
+def test_english_translation_covers_menu_and_training_labels() -> None:
+    assert launcher_v7.translated("en", "Hazır modelleri izle") == "Watch ready models"
+    assert launcher_v7.translated("en", launcher_v7.PHASE_LABELS["full"]) == (
+        "Full training — 5 × 5M steps"
+    )
+    assert launcher_v7.translated("en", "Eğitim kayıtları") == "Training records"
+    assert launcher_v7.translated("tr", "Eğitim kayıtları") == "Eğitim kayıtları"
+
+
+def test_first_language_choice_is_persisted_and_opens_main_menu(monkeypatch) -> None:
+    saved: list[str] = []
+    monkeypatch.setattr(
+        launcher_v7, "save_language", lambda language: saved.append(language) is None
+    )
+    launcher = launcher_v7.TankLauncher.__new__(launcher_v7.TankLauncher)
+    launcher.language = "tr"
+    launcher.state = "language"
+    launcher.message = ""
+    launcher.message_color = launcher.MUTED
+    launcher.job = None
+
+    launcher.finish_language_selection("en")
+
+    assert saved == ["en"]
+    assert launcher.language == "en"
+    assert launcher.state == "main"
+    assert launcher.current_status() == "Ready. Choose an option."

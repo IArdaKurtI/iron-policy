@@ -32,6 +32,165 @@ RUNS_ROOT = ROOT / "runs_v7"
 WINDOW_SIZE = (900, 700)
 WORLD_OFFSET = (50, 18)
 
+SUPPORTED_LANGUAGES = {"tr", "en"}
+
+
+def default_settings_path() -> Path:
+    if os.name == "nt" and os.environ.get("LOCALAPPDATA"):
+        return Path(os.environ["LOCALAPPDATA"]) / "IronPolcyV7" / "settings.json"
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / "IronPolcyV7" / "settings.json"
+    config_home = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+    return config_home / "iron-polcy-v7" / "settings.json"
+
+
+SETTINGS_PATH = default_settings_path()
+
+
+def load_language(path: Path | None = None) -> str | None:
+    target = path or SETTINGS_PATH
+    try:
+        payload = json.loads(target.read_text(encoding="utf-8"))
+    except (OSError, TypeError, json.JSONDecodeError):
+        return None
+    language = payload.get("language") if isinstance(payload, dict) else None
+    return str(language) if language in SUPPORTED_LANGUAGES else None
+
+
+def save_language(language: str, path: Path | None = None) -> bool:
+    if language not in SUPPORTED_LANGUAGES:
+        raise ValueError("language must be tr or en")
+    target = path or SETTINGS_PATH
+    temporary = target.with_suffix(".tmp")
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        temporary.write_text(
+            json.dumps({"language": language}, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary, target)
+        return True
+    except OSError:
+        temporary.unlink(missing_ok=True)
+        return False
+
+
+ENGLISH_TEXT = {
+    "Yükleniyor": "Loading",
+    "Uygulama yükleniyor…": "Loading application…",
+    "Hızlı kontrol — 16 bin adım": "Quick check — 16K steps",
+    "Davranış eğitimi — 200 bin adım": "Behavior training — 200K steps",
+    "Pilot eğitim — 3 × 1 milyon adım": "Pilot training — 3 × 1M steps",
+    "Tam eğitim — 5 × 5 milyon adım": "Full training — 5 × 5M steps",
+    "Program hazır. Bir seçenek seçin.": "Ready. Choose an option.",
+    "Dil seçin": "Choose language",
+    "Bu seçim daha sonra sağ üstten değiştirilebilir.": "You can change this later from the top-right corner.",
+    "Türkçe": "Türkçe",
+    "Tek pencere kontrol merkezi": "Single-window control center",
+    "Hazır modelleri izle": "Watch ready models",
+    "Son eğittiğim modelleri izle": "Watch my latest trained models",
+    "Eğitim seçenekleri": "Training options",
+    "Eğitim kayıtları": "Training records",
+    "Eğitim durumunu göster": "Show training status",
+    "Programı teknik olarak kontrol et": "Run technical checks",
+    "Çıkış": "Exit",
+    "Henüz eğitim kaydı bulunmuyor.": "No training records yet.",
+    "Çalışıyor": "Running",
+    "Tamamlandı": "Completed",
+    "Yarım kaldı": "Incomplete",
+    "Başlatıldı": "Started",
+    "Aç": "Open",
+    "Sil": "Delete",
+    "Önceki": "Previous",
+    "Sonraki": "Next",
+    "Ana menüye dön": "Return to main menu",
+    "Eğitim kaydını sil": "Delete training record",
+    "Bu kayıt Geri Dönüşüm Kutusu’na taşınacak.": "This record will be moved to the Recycle Bin.",
+    "Evet — kaydı sil": "Yes — delete record",
+    "Hayır — vazgeç": "No — cancel",
+    "Görüntü açmadan eğitim başlat": "Start training without match rendering",
+    "Eğitim sırasında bu pencere açık kalır; başka pencere açılmaz.": "This window stays open during training; no second window appears.",
+    "Teknik kontrol durumu": "Technical check status",
+    "Eğitim durumu": "Training status",
+    "Henüz teknik kontrol başlatılmadı.": "No technical check has been started yet.",
+    "Bu kontrol eğitimlerden ve eğitim kayıtlarından bağımsızdır.": "This check is independent of training and training records.",
+    "Teknik kontrolü başlat": "Start technical check",
+    "Şu anda çalışan bir eğitim yok.": "No training is currently running.",
+    "Kayıtları görmek veya silmek için aşağıdaki düğmeyi kullanın.": "Use the button below to view or delete records.",
+    "Eğitim kayıtlarını göster": "Show training records",
+    "Kayıtlı bir eğitim de bulunamadı.": "No saved training was found either.",
+    "Yeni bir eğitim başlatmak için eğitim seçeneklerini açın.": "Open training options to start a new training run.",
+    "Eğitim seçeneklerini aç": "Open training options",
+    "Çalışıyor…": "Running…",
+    "Sonuç hazırlanıyor…": "Preparing results…",
+    "Senin isteğinle durduruldu": "Stopped at your request",
+    "Tamamlanamadı": "Failed",
+    "hazırlanıyor": "preparing",
+    "Programın temel parçaları kontrol ediliyor.": "Checking the program's core components.",
+    "Bu işlem tankları eğitmez ve eğitim kayıtlarını değiştirmez.": "This does not train tanks or modify training records.",
+    "Otomatik kontroller başarıyla geçti.": "Automated checks passed.",
+    "Program düzgün çalışıyor.": "The program is working correctly.",
+    "Programın teknik kontrolü tamamlanamadı.": "The technical check could not be completed.",
+    "Bu mesaj, eğitim kaydı bulunmadığı anlamına gelmez.": "This does not mean that no training record exists.",
+    "Uygulamayı yeniden açıp kontrolü tekrar deneyebilirsiniz.": "Reopen the application and try the check again.",
+    "Eğitim devam ediyor; ilerleme yukarıda canlı gösteriliyor.": "Training is running; live progress is shown above.",
+    "Oluşan dosyalar otomatik olarak eğitim kayıtlarına ekleniyor.": "Generated files are automatically added to training records.",
+    "Eğitim senin isteğinle durduruldu.": "Training was stopped at your request.",
+    "O ana kadar oluşan dosyalar eğitim kayıtlarında saklandı.": "Files created up to that point were kept in training records.",
+    "Eğitim başarıyla tamamlandı.": "Training completed successfully.",
+    "Yeni modeller izlenmeye hazır.": "The new models are ready to watch.",
+    "Eğitim beklenmedik biçimde durdu.": "Training stopped unexpectedly.",
+    "Varsa yarım kalan dosyalar eğitim kayıtlarından görülebilir.": "Any partial files can be viewed in training records.",
+    "Son eğitilen modelleri izle": "Watch latest trained models",
+    "ESC: ana menü": "ESC: main menu",
+    "Çıkış onayı": "Confirm exit",
+    "Eğitim şu anda devam ediyor.": "Training is currently running.",
+    "Çıkarsanız eğitim durdurulacak ve arkada çalışmayacak.": "If you exit, training will stop and will not continue in the background.",
+    "Çıkmak istediğinizden emin misiniz?": "Are you sure you want to exit?",
+    "Evet — eğitimi durdur ve çık": "Yes — stop training and exit",
+    "Hayır — eğitime devam et": "No — continue training",
+    "Program testleri": "Program tests",
+    "Modeller yükleniyor…": "Loading models…",
+    "Son eğitim": "Latest training",
+    "Hazır modeller": "Ready models",
+    "Leo kazandı": "Leo won",
+    "T-90 kazandı": "T-90 won",
+    "Çifte nakavt": "Double knockout",
+    "Berabere": "Draw",
+    "Maç tamamlandı": "Match completed",
+    "Maçtan ana menüye dönüldü.": "Returned to the main menu from the match.",
+    "Dil değiştirildi ancak tercih kaydedilemedi.": "Language changed, but the preference could not be saved.",
+    "Sayfa {current} / {total}": "Page {current} / {total}",
+    "{completed:,} / {total:,} adım • {size}": "{completed:,} / {total:,} steps • {size}",
+    "{count} kayıtlı eğitim bulundu; bunlar şu anda aktif değil.": "{count} training records were found; none are currently active.",
+    "Adım: {completed:,} / {total:,}": "Steps: {completed:,} / {total:,}",
+    "Tur: {completed:,} / {total:,}": "Rounds: {completed:,} / {total:,}",
+    "Seed: {seed}   Hız: {speed:,} adım/sn": "Seed: {seed}   Speed: {speed:,} steps/s",
+    "{passed} otomatik kontrol başarıyla geçti.": "{passed} automated checks passed.",
+    "Maç {match} • adım {step}": "Match {match} • step {step}",
+    "{title} arka planda çalışıyor.": "{title} is running in the background.",
+    "{title} sonucu hazırlanıyor.": "Preparing the result for {title}.",
+    "{title} senin isteğinle durduruldu.": "{title} was stopped at your request.",
+    "{title} tamamlandı.": "{title} completed.",
+    "{title} tamamlanamadı; açıklama için durum ekranını açın.": "{title} failed; open the status screen for details.",
+    "Eğitim klasörü artık mevcut değil. Kayıt listesi yenilendi.": "The training folder no longer exists. The record list was refreshed.",
+    "Eğitim klasörü açılamadı: {error}": "The training folder could not be opened: {error}",
+    "Devam eden eğitim kaydı silinemez.": "An active training record cannot be deleted.",
+    "Seed {seed} kaydı Geri Dönüşüm Kutusu’na taşındı.": "Seed {seed} was moved to the Recycle Bin.",
+    "Eğitim kaydı silinemedi: {error}": "The training record could not be deleted: {error}",
+    "Önce devam eden işlemin tamamlanmasını bekleyin.": "Wait for the current operation to finish first.",
+    "{title} başlatıldı.": "{title} started.",
+    "Eğitim başlatılamadı: {error}": "Training could not be started: {error}",
+    "Program testleri başlatıldı.": "Program tests started.",
+    "Test başlatılamadı: {error}": "The test could not be started: {error}",
+    "İzlenecek model bulunamadı. Önce bir eğitim tamamlayın.": "No model is available to watch. Complete a training run first.",
+    "Modeller açılamadı: {error}": "Models could not be opened: {error}",
+}
+
+
+def translated(language: str, value: str) -> str:
+    return ENGLISH_TEXT.get(value, value) if language == "en" else value
+
 
 def show_startup_screen() -> None:
     """Show immediate feedback while the heavier AI modules are imported."""
@@ -47,13 +206,20 @@ def show_startup_screen() -> None:
     pygame.init()
     if APP_ICON.is_file():
         pygame.display.set_icon(pygame.image.load(str(APP_ICON)))
-    pygame.display.set_caption("Iron Polcy v7 — Yükleniyor")
+    language = load_language()
+    loading_label = translated(language or "en", "Yükleniyor")
+    pygame.display.set_caption(f"Iron Polcy v7 — {loading_label}")
     screen = pygame.display.set_mode(WINDOW_SIZE)
     screen.fill((0, 0, 0))
     title_font = pygame.font.SysFont("Segoe UI Semibold", 42)
     message_font = pygame.font.SysFont("Segoe UI", 23)
     title = title_font.render("IRON POLCY v7", True, (255, 255, 255))
-    message = message_font.render("Uygulama yükleniyor…", True, (255, 255, 255))
+    loading_message = (
+        translated(language, "Uygulama yükleniyor…")
+        if language is not None
+        else "Yükleniyor… / Loading…"
+    )
+    message = message_font.render(loading_message, True, (255, 255, 255))
     screen.blit(title, title.get_rect(center=(WINDOW_SIZE[0] // 2, 290)))
     screen.blit(message, message.get_rect(center=(WINDOW_SIZE[0] // 2, 350)))
     pygame.display.flip()
@@ -336,6 +502,7 @@ class Button:
     action: Callable[[], None]
     enabled: bool = True
     compact: bool = False
+    selected: bool = False
 
 
 @dataclass(frozen=True)
@@ -522,7 +689,9 @@ class TankLauncher:
         self.small = pygame.font.SysFont("Segoe UI", 18)
         self.tiny = pygame.font.SysFont("Consolas", 15)
         self.title_font = pygame.font.SysFont("Segoe UI Semibold", 38)
-        self.state = "main"
+        stored_language = load_language()
+        self.language = stored_language or "tr"
+        self.state = "main" if stored_language is not None else "language"
         self.message = "Program hazır. Bir seçenek seçin."
         self.message_color = self.MUTED
         self.buttons: list[Button] = []
@@ -546,16 +715,39 @@ class TankLauncher:
         self.records_page = 0
         self.pending_delete: TrainingRecord | None = None
 
+    def t(self, value: str) -> str:
+        return translated(self.language, value)
+
+    def tf(self, value: str, **values: object) -> str:
+        return self.t(value).format(**values)
+
+    def change_language(self, language: str) -> None:
+        if language not in SUPPORTED_LANGUAGES:
+            return
+        self.language = language
+        if save_language(language):
+            self.message = "Program hazır. Bir seçenek seçin."
+            self.message_color = self.MUTED
+        else:
+            self.message = "Dil değiştirildi ancak tercih kaydedilemedi."
+            self.message_color = self.RED
+
+    def finish_language_selection(self, language: str) -> None:
+        self.change_language(language)
+        self.state = "main"
+
     def text(self, value: str, pos: tuple[int, int], color=None, font=None) -> None:
-        surface = (font or self.font).render(value, True, color or self.TEXT)
+        surface = (font or self.font).render(self.t(value), True, color or self.TEXT)
         self.screen.blit(surface, pos)
 
     def centered(self, value: str, y: int, color=None, font=None) -> None:
-        surface = (font or self.font).render(value, True, color or self.TEXT)
+        surface = (font or self.font).render(self.t(value), True, color or self.TEXT)
         self.screen.blit(surface, ((WINDOW_SIZE[0] - surface.get_width()) // 2, y))
 
     def button(self, y: int, label: str, action: Callable[[], None], enabled=True) -> None:
-        self.buttons.append(Button(pygame.Rect(225, y, 450, 54), label, action, enabled))
+        self.buttons.append(
+            Button(pygame.Rect(225, y, 450, 54), self.t(label), action, enabled)
+        )
 
     def compact_button(
         self,
@@ -563,14 +755,26 @@ class TankLauncher:
         label: str,
         action: Callable[[], None],
         enabled: bool = True,
+        selected: bool = False,
     ) -> None:
-        self.buttons.append(Button(pygame.Rect(*rect), label, action, enabled, compact=True))
+        self.buttons.append(
+            Button(
+                pygame.Rect(*rect),
+                self.t(label),
+                action,
+                enabled,
+                compact=True,
+                selected=selected,
+            )
+        )
 
     def draw_buttons(self) -> None:
         mouse = pygame.mouse.get_pos()
         for button in self.buttons:
             if not button.enabled:
                 color = self.DISABLED
+            elif button.selected:
+                color = self.TEXT
             elif button.rect.collidepoint(mouse):
                 color = self.BUTTON_HOVER
             else:
@@ -578,12 +782,52 @@ class TankLauncher:
             pygame.draw.rect(self.screen, color, button.rect, border_radius=10)
             pygame.draw.rect(self.screen, self.BLUE if button.enabled else self.DISABLED, button.rect, 2, 10)
             font = self.small if button.compact else self.font
-            rendered = font.render(button.label, True, self.TEXT if button.enabled else self.MUTED)
+            text_color = self.BG if button.selected else (
+                self.TEXT if button.enabled else self.MUTED
+            )
+            rendered = font.render(button.label, True, text_color)
             self.screen.blit(rendered, rendered.get_rect(center=button.rect.center))
+
+    def draw_language_switcher(self) -> None:
+        self.compact_button(
+            (752, 20, 52, 34),
+            "TR",
+            lambda: self.change_language("tr"),
+            selected=self.language == "tr",
+        )
+        self.compact_button(
+            (812, 20, 52, 34),
+            "EN",
+            lambda: self.change_language("en"),
+            selected=self.language == "en",
+        )
+
+    def draw_language_selection(self) -> None:
+        self.screen.fill(self.BG)
+        self.buttons.clear()
+        self.centered("IRON POLCY v7", 95, self.TEXT, self.title_font)
+        self.centered("Dil seçin", 205, self.TEXT, self.font)
+        self.centered("Choose language", 247, self.TEXT, self.font)
+        self.centered(
+            "Bu seçim daha sonra sağ üstten değiştirilebilir.",
+            292,
+            self.MUTED,
+            self.small,
+        )
+        self.centered(
+            "You can change this later from the top-right corner.",
+            322,
+            self.MUTED,
+            self.small,
+        )
+        self.button(365, "Türkçe", lambda: self.finish_language_selection("tr"))
+        self.button(435, "English", lambda: self.finish_language_selection("en"))
+        self.draw_buttons()
 
     def draw_header(self, subtitle: str) -> None:
         self.centered("IRON POLCY v7", 48, self.TEXT, self.title_font)
         self.centered(subtitle, 100, self.MUTED, self.small)
+        self.draw_language_switcher()
 
     def draw_main(self) -> None:
         self.screen.fill(self.BG)
@@ -631,8 +875,10 @@ class TankLauncher:
         for index, record in enumerate(visible):
             y = 135 + index * 100
             active = self.record_is_active(record)
-            status = "Çalışıyor" if active else record.status
-            phase_label = PHASE_LABELS.get(record.phase, record.phase).split("—")[0].strip()
+            status = self.t("Çalışıyor") if active else self.t(record.status)
+            phase_label = self.t(
+                PHASE_LABELS.get(record.phase, record.phase)
+            ).split("—")[0].strip()
             percentage = (
                 100.0 * record.completed_steps / record.total_steps
                 if record.total_steps
@@ -668,7 +914,16 @@ class TankLauncher:
                 self.previous_records_page,
                 self.records_page > 0,
             )
-            self.centered(f"Sayfa {self.records_page + 1} / {total_pages}", 565, self.TEXT, self.small)
+            self.centered(
+                self.tf(
+                    "Sayfa {current} / {total}",
+                    current=self.records_page + 1,
+                    total=total_pages,
+                ),
+                565,
+                self.TEXT,
+                self.small,
+            )
             self.compact_button(
                 (545, 555, 130, 42),
                 "Sonraki",
@@ -689,12 +944,17 @@ class TankLauncher:
         if record is None:
             self.state = "records"
             return
-        phase_label = PHASE_LABELS.get(record.phase, record.phase).split("—")[0].strip()
+        phase_label = self.t(PHASE_LABELS.get(record.phase, record.phase)).split("—")[0].strip()
         pygame.draw.rect(self.screen, self.PANEL, (100, 180, 700, 220), border_radius=12)
         pygame.draw.rect(self.screen, self.TEXT, (100, 180, 700, 220), 1, 12)
         self.centered(f"{phase_label} • seed {record.seed}", 220, self.TEXT, self.font)
         self.centered(
-            f"{record.completed_steps:,} / {record.total_steps:,} adım • {self._format_size(record.size_bytes)}",
+            self.tf(
+                "{completed:,} / {total:,} adım • {size}",
+                completed=record.completed_steps,
+                total=record.total_steps,
+                size=self._format_size(record.size_bytes),
+            ),
             270,
             self.TEXT,
             self.small,
@@ -742,7 +1002,10 @@ class TankLauncher:
             elif record_count:
                 self.centered("Şu anda çalışan bir eğitim yok.", 220, self.TEXT, self.font)
                 self.centered(
-                    f"{record_count} kayıtlı eğitim bulundu; bunlar şu anda aktif değil.",
+                    self.tf(
+                        "{count} kayıtlı eğitim bulundu; bunlar şu anda aktif değil.",
+                        count=record_count,
+                    ),
                     278,
                     self.MUTED,
                     self.small,
@@ -781,7 +1044,7 @@ class TankLauncher:
                 color = self.RED
                 status = "Tamamlanamadı"
             self.text(job.title, (78, 167), self.TEXT, self.font)
-            status_surface = self.small.render(status, True, color)
+            status_surface = self.small.render(self.t(status), True, color)
             self.screen.blit(status_surface, (820 - status_surface.get_width(), 170))
             progress = job.progress_snapshot()
             if progress is not None:
@@ -797,13 +1060,21 @@ class TankLauncher:
                     )
                 self.text(f"%{float(progress['percent']):.1f}", (760, 214), self.TEXT, self.tiny)
                 self.text(
-                    f"Adım: {int(progress['completed_steps']):,} / {int(progress['total_steps']):,}",
+                    self.tf(
+                        "Adım: {completed:,} / {total:,}",
+                        completed=int(progress["completed_steps"]),
+                        total=int(progress["total_steps"]),
+                    ),
                     (78, 250),
                     self.TEXT,
                     self.small,
                 )
                 self.text(
-                    f"Tur: {int(progress['completed_generations']):,} / {int(progress['total_generations']):,}",
+                    self.tf(
+                        "Tur: {completed:,} / {total:,}",
+                        completed=int(progress["completed_generations"]),
+                        total=int(progress["total_generations"]),
+                    ),
                     (390, 250),
                     self.TEXT,
                     self.small,
@@ -814,9 +1085,13 @@ class TankLauncher:
                     self.TEXT,
                     self.small,
                 )
-                seed_text = "hazırlanıyor" if progress["seed"] is None else str(progress["seed"])
+                seed_text = self.t("hazırlanıyor") if progress["seed"] is None else str(progress["seed"])
                 self.text(
-                    f"Seed: {seed_text}   Hız: {int(progress['sps']):,} adım/sn",
+                    self.tf(
+                        "Seed: {seed}   Hız: {speed:,} adım/sn",
+                        seed=seed_text,
+                        speed=int(progress["sps"]),
+                    ),
                     (390, 278),
                     self.MUTED,
                     self.small,
@@ -836,7 +1111,14 @@ class TankLauncher:
                         ),
                         None,
                     )
-                    result_text = f"{passed} otomatik kontrol başarıyla geçti." if passed else "Otomatik kontroller başarıyla geçti."
+                    result_text = (
+                        self.tf(
+                            "{passed} otomatik kontrol başarıyla geçti.",
+                            passed=passed,
+                        )
+                        if passed
+                        else self.t("Otomatik kontroller başarıyla geçti.")
+                    )
                     message_lines = [result_text, "Program düzgün çalışıyor."]
                 else:
                     message_lines = [
@@ -885,13 +1167,20 @@ class TankLauncher:
     def draw_match(self) -> None:
         assert self.match_env is not None
         self.screen.fill(self.BG)
+        self.buttons.clear()
         self.match_env._draw_world(self.world_surface)
         self.screen.blit(self.world_surface, WORLD_OFFSET)
         pygame.draw.rect(self.screen, (10, 15, 21), (50, 618, 800, 64))
         self.text(self.match_label, (68, 630), self.TEXT, self.small)
         self.text("ESC: ana menü", (690, 630), self.MUTED, self.small)
-        result = self.match_result or f"Maç {self.match_number + 1} • adım {self.match_env.current_step}"
+        result = self.match_result or self.tf(
+            "Maç {match} • adım {step}",
+            match=self.match_number + 1,
+            step=self.match_env.current_step,
+        )
         self.text(result, (68, 655), self.GREEN if self.match_result else self.MUTED, self.small)
+        self.draw_language_switcher()
+        self.draw_buttons()
 
     def draw_exit_confirmation(self) -> None:
         self.screen.fill(self.BG)
@@ -912,16 +1201,20 @@ class TankLauncher:
 
     def current_status(self) -> str:
         if self.job is None:
-            return self.message
+            return self.t(self.message)
+        title = self.t(self.job.title)
         if self.job.running:
-            return f"{self.job.title} arka planda çalışıyor."
+            return self.tf("{title} arka planda çalışıyor.", title=title)
         if self.job.return_code is None:
-            return f"{self.job.title} sonucu hazırlanıyor."
+            return self.tf("{title} sonucu hazırlanıyor.", title=title)
         if self.job.stopped_by_user:
-            return f"{self.job.title} senin isteğinle durduruldu."
+            return self.tf("{title} senin isteğinle durduruldu.", title=title)
         if self.job.return_code == 0:
-            return f"{self.job.title} tamamlandı."
-        return f"{self.job.title} tamamlanamadı; açıklama için durum ekranını açın."
+            return self.tf("{title} tamamlandı.", title=title)
+        return self.tf(
+            "{title} tamamlanamadı; açıklama için durum ekranını açın.",
+            title=title,
+        )
 
     def job_running(self) -> bool:
         return self.job is not None and self.job.running
@@ -963,7 +1256,7 @@ class TankLauncher:
                     start_new_session=True,
                 )
         except (AttributeError, OSError) as exc:
-            self.message = f"Eğitim klasörü açılamadı: {exc}"
+            self.message = self.tf("Eğitim klasörü açılamadı: {error}", error=exc)
             self.message_color = self.RED
 
     def request_delete_record(self, record: TrainingRecord) -> None:
@@ -990,10 +1283,13 @@ class TankLauncher:
             return
         try:
             recycle_training_record(record.path)
-            self.message = f"Seed {record.seed} kaydı Geri Dönüşüm Kutusu’na taşındı."
+            self.message = self.tf(
+                "Seed {seed} kaydı Geri Dönüşüm Kutusu’na taşındı.",
+                seed=record.seed,
+            )
             self.message_color = self.GREEN
         except Exception as exc:
-            self.message = f"Eğitim kaydı silinemedi: {exc}"
+            self.message = self.tf("Eğitim kaydı silinemedi: {error}", error=exc)
             self.message_color = self.RED
         self.training_records = discover_training_records()
         total_pages = max(1, math.ceil(len(self.training_records) / 4))
@@ -1024,11 +1320,13 @@ class TankLauncher:
                 training_phase=phase,
             )
             self.training_job = self.job
-            self.message = f"{PHASE_LABELS[phase]} başlatıldı."
+            self.message = self.tf(
+                "{title} başlatıldı.", title=self.t(PHASE_LABELS[phase])
+            )
             self.message_color = self.BLUE
             self.state = "status"
         except Exception as exc:
-            self.message = f"Eğitim başlatılamadı: {exc}"
+            self.message = self.tf("Eğitim başlatılamadı: {error}", error=exc)
             self.message_color = self.RED
             self.state = "main"
 
@@ -1052,7 +1350,7 @@ class TankLauncher:
             self.message_color = self.BLUE
             self.state = "test_status"
         except Exception as exc:
-            self.message = f"Test başlatılamadı: {exc}"
+            self.message = self.tf("Test başlatılamadı: {error}", error=exc)
             self.message_color = self.RED
 
     def start_match(self, latest: bool) -> None:
@@ -1077,7 +1375,7 @@ class TankLauncher:
             self.state = "match"
         except Exception as exc:
             self.close_match()
-            self.message = f"Modeller açılamadı: {exc}"
+            self.message = self.tf("Modeller açılamadı: {error}", error=exc)
             self.message_color = self.RED
             self.state = "main"
 
@@ -1157,6 +1455,8 @@ class TankLauncher:
                     if event.type == pygame.QUIT:
                         self.request_exit()
                     elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        if self.state == "language":
+                            continue
                         if self.state == "match":
                             self.close_match()
                             self.state = "main"
@@ -1171,7 +1471,9 @@ class TankLauncher:
                     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         self.handle_click(event.pos)
 
-                if self.state == "match":
+                if self.state == "language":
+                    self.draw_language_selection()
+                elif self.state == "match":
                     self.update_match()
                     self.draw_match()
                 elif self.state == "confirm_exit":

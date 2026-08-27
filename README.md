@@ -1,135 +1,136 @@
-# Iron Polcy v7
+Iron Policy v7
 
-Iron Polcy v7, Leo ve T-90 adlı iki yapay zekâ tankını eğiten ve maçlarını aynı
-uygulama penceresinde gösteren iki boyutlu bir simülasyondur.
+Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator
 
-## Windows'ta çalıştırma
+Iron Policy v7 is a two-dimensional reinforcement learning simulation in which two AI-controlled tanks, Leo and T-90, learn while competing against each other in the same environment.
 
-1. GitHub'da `Code` → `Download ZIP` seçeneğiyle projeyi indirin.
-2. ZIP dosyasını normal bir klasöre çıkarın. Programı ZIP'in içinden açmayın.
-3. `iron polcy v7.vbs` dosyasına çift tıklayın.
+The project includes two independent PPO policies, synchronized co-evolution, mirrored evaluation, checkpoint cross-play, behavioral analysis, and an experimental Failure Memory mechanism.
 
-İlk açılışta gerekli paketler otomatik kurulur; internet hızına göre birkaç dakika
-sürebilir. Kurulumdan sonra uygulama açılır ve özel ikonlu `Iron Polcy v7`
-kısayolu hem proje klasöründe hem Windows masaüstünde otomatik oluşturulur. Sonraki
-açılışlarda masaüstündeki bu kısayol kullanılabilir.
+Iron Policy is an experimental AI simulation. It is not intended to model or evaluate real-world weapon systems.
 
-Alternatif olarak `BASLAT.bat` dosyasına çift tıklayabilirsiniz. Bilgisayarda
-Python 3.10, 3.11, 3.12 veya 3.13 bulunmalıdır. Python yoksa
-[python.org](https://www.python.org/downloads/) üzerinden kurulabilir; kurulumda
-`Add Python to PATH` seçeneğini işaretleyin.
+Key Features
+Two independent PPO agents
+Synchronized dual-policy co-evolution
+Different physical characteristics for Leo and T-90
+Mirrored training and evaluation scenarios
+Random and scripted baseline agents
+Checkpoint cross-play evaluation
+Behavioral analysis and automatic metrics
+Experimental Failure Memory mechanism
+Multi-seed experiment support
+Automated testing with GitHub Actions
+Running on Windows
+Download the repository using Code → Download ZIP.
+Extract the ZIP into a normal folder.
+Run iron polcy v7.vbs.
 
-## macOS ve Linux'ta çalıştırma
+The required packages are installed automatically during the first launch.
 
-Python 3.10–3.13 kurulu olmalıdır. Proje klasöründe şu komutları çalıştırın:
+Python 3.10–3.13 must be installed.
 
-```sh
+Alternatively, BASLAT.bat can be used.
+
+Running on macOS and Linux
+
+Python 3.10–3.13 is required.
+
+Run:
+
 sh KUR.sh
+
 sh BASLAT.sh
-```
 
-İlk komut yalnızca ilk kurulum veya bağımlılıklar değiştiğinde gereklidir.
+KUR.sh is only required during the initial setup or when dependencies change.
 
-## Uygulamada neler var?
+Training Presets
 
-- `Hazır modelleri izle`: Projeyle gelen Leo ve T-90 modellerinin maçını açar.
-- `Son eğittiğim modelleri izle`: En son tamamlanan eğitimin modellerini açar.
-- `Eğitim seçenekleri`: Kısa kontrol, davranış, pilot veya tam eğitim başlatır.
-- `Eğitim kayıtları`: Kayıtların ilerlemesini, boyutunu ve tarihini gösterir.
-- `Eğitim durumunu göster`: Yalnızca son veya aktif eğitimin durumunu gösterir.
-- `Programı teknik olarak kontrol et`: Uygulamanın temel parçalarını otomatik sınar.
+Iron Policy provides several predefined training phases.
 
-Eğitim durumu ile teknik kontrol sonucu ayrı ekranlarda tutulur; biri diğerinin
-durumunu değiştirmez. Uygulama açılırken ana menü hazır olana kadar aynı pencerede
-`Uygulama yükleniyor…` bilgisi gösterilir.
+Smoke Test: 16,384 timesteps — 1 seed
+Behavior Training: 200,000 timesteps — 1 seed
+Pilot Training: 1,000,000 timesteps per seed — 3 seeds
+Full Training: 5,000,000 timesteps per seed — 5 seeds
 
-Eğitim kayıtları ekranındaki `Aç` düğmesi ilgili klasörü gösterir. `Sil` düğmesi
-onay aldıktan sonra kaydı işletim sisteminin Geri Dönüşüm Kutusu/Çöp klasörüne
-taşır. Devam eden eğitim yanlışlıkla silinemez.
+Training parameters remain consistent across systems.
 
-Uygulama eğitim sırasında kapatılırsa önce onay ister. Çıkış onaylandığında eğitim
-ve ona bağlı işlemler birlikte durur; arkada çalışmaya devam etmez.
+Headless training runs on the CPU and does not require CUDA or an NVIDIA GPU.
 
-## Eğitim seçenekleri
+Checkpoint Cross-Play
 
-- Hızlı kontrol: 16.384 adım, 1 seed
-- Davranış eğitimi: 200.000 adım, 1 seed
-- Pilot eğitim: seed başına 1 milyon adım, 3 seed
-- Tam eğitim: seed başına 5 milyon adım, 5 seed
+Saved checkpoints are automatically evaluated against each other after training.
 
-Eğitim ayarları bilgisayara göre gizlice değiştirilmez. Tank hareket hızları,
-reload süreleri, PPO epoch sayısı ve kayıtlı deney düzeni bütün bilgisayarlarda
-aynıdır. Uygulama görüntüsüz eğitimi CPU üzerinde çalıştırır; CUDA veya NVIDIA
-ekran kartı zorunlu değildir.
+A full training run can compare:
 
-## Klasör ve GitHub taşınabilirliği
+0M
+1M
+2M
+3M
+4M
+final
 
-Proje klasörü başka yere taşınabilir veya yeniden adlandırılabilir. Başlatıcılar
-bulundukları klasörü otomatik algılar; sabit kullanıcı veya masaüstü adresi
-kullanmaz. Windows kısayolu her başlatmada güncel konuma göre yenilenir. OneDrive
-altındaki bir yedek kopya, çalışan yerel masaüstü kısayolunun hedefini değiştiremez.
+Checkpoint cross-play can help reveal:
 
-GitHub'a gönderilmemesi gereken dosyalar `.gitignore` tarafından otomatik dışlanır:
+Performance regression against older policies
+Non-transitive policy relationships
+Behavioral cycles
+Possible catastrophic forgetting
 
-- `.venv`: Bilgisayara özel Python ortamı
-- `runs_v7`: Kullanıcının eğitim kayıtları
-- `*.lnk`: Bilgisayara özel Windows kısayolu
-- önbellek ve geçici dosyalar
+Checkpoint cross-play is an evaluation method only.
 
-`models_v7` klasöründeki küçük hazır modeller projeye dahildir; böylece yeni bir
-kullanıcı eğitim yapmadan hemen maç izleyebilir.
+The current training architecture uses synchronized co-evolution and should not be described as historical or league-based self-play.
 
-## Geliştirici kullanımı
+Failure Memory
 
-Windows test komutu:
+Failure Memory is an experimental exploration mechanism.
 
-```powershell
-.\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
-```
+When an agent enters a state similar to previously recorded failure states, the local entropy multiplier can be increased to encourage additional exploration.
 
-macOS/Linux test komutu:
+Failure Memory does not directly modify the reward.
 
-```sh
-./.venv/bin/python -B -m pytest -q -p no:cacheprovider
-```
+The mechanism is disabled by default.
 
-GitHub Actions, her gönderimde Windows ve Ubuntu üzerinde Python 3.12 ve 3.13 ile
-aynı testleri otomatik çalıştırır.
+Its effectiveness should only be evaluated through controlled experiments comparing Failure Memory OFF and ON under the same seeds and training conditions.
 
-Komut satırından kısa eğitim örneği:
+Experimental Scope and Limitations
 
-```powershell
-.\.venv\Scripts\python.exe train_v7.py --total-timesteps 16384 --n-envs 2 --n-steps 256 --batch-size 256
-```
+The observation space contains 23 features.
 
-Sonuçlar otomatik olarak `runs_v7` klasörüne yazılır.
+Each agent observes information about the nearest hostile projectile, while additional simultaneous projectiles are not directly represented. The environment can therefore be considered partially observable from the agent's perspective.
 
-Eğitim tamamlandığında final modellerin normal değerlendirmesine ek olarak kayıtlı
-checkpoint'ler otomatik cross-play değerlendirmesine alınır. Örneğin tam eğitimde
-`0M`, `1M`, `2M`, `3M`, `4M` ve `final` modelleri birbirleriyle oynatılır. Sonuçlar
-ilgili seed'in `logs/checkpoint_crossplay` klasöründeki `episodes.csv`,
-`evaluation_v7.json` ve `crossplay_matrix.png` dosyalarına yazılır. Bu işlem eski
-politikalara karşı performans düşüşünü ve politika döngülerini görünür kılar; eğitimi
-historical self-play'e dönüştürmez. Gerçek historical self-play için eski modellerin
-eğitim sırasındaki rakip havuzuna da katılması gerekir.
+The main reward profile is minimal. A separate shaped profile is retained for comparison and ablation experiments.
 
-## Deneysel kapsam ve bilinen sınırlamalar
+Projectile evasion measurements in new trajectory records use separate projectile distances for Leo and T-90. Older results based on a shared projectile-distance value should not be used for scientific comparison.
 
-- Observation 23 boyutludur. Ajan, kendisine en yakın düşman mermisinin konumunu ve
-  hızını görür; aynı anda havadaki ikinci ve sonraki mermiler observation'a girmez.
-  Bu nedenle ortam ajan açısından kısmen gözlemlenebilir (POMDP) kabul edilmelidir.
-  Mevcut model uyumluluğunu korumak için observation boyutu değiştirilmemiştir.
-- Projectile evasion metriği yeni kayıtlarda Leo ve T-90 için ayrı mermi mesafeleri
-  kullanır. Eski CSV dosyaları açılabilir fakat tek ortak mesafe içeren eski
-  `projectile_evasion_ratio` sonuçları bilimsel karşılaştırmada kullanılmamalıdır.
-- Failure Memory, normalize edilmiş 23 özellik üzerinde ağırlıksız Öklid uzaklığı
-  kullanır ve varsayılan olarak kapalıdır. Etkisi, aynı seed'lerde `off` ve `entropy`
-  deneyleri karşılaştırılmadan kanıtlanmış kabul edilmemelidir.
-- Ana deney profili `minimal`dır. `shaped` profilde ideal mesafeye yaklaşma ödülü iki
-  ajana birden verildiği için yalnızca karşılaştırma/ablation amacıyla tutulur.
-- Mevcut eğitim eşzamanlı co-evolution'dır; historical self-play değildir.
+Testing
 
-## Not
+Iron Policy includes automated tests for the environment, training system, evaluation pipeline, Failure Memory mechanism, and other core components.
 
-Bu proje gerçek tank veya silah sistemi testi değildir. Deneysel bir yapay zekâ
-simülasyonudur.
+Tests are built with pytest.
+
+GitHub Actions automatically runs the test suite on Windows and Ubuntu using Python 3.12 and 3.13 when changes are pushed to the repository.
+
+Development Note
+
+Iron Policy was developed extensively with the assistance of AI coding tools.
+
+The project direction, behavioral observations, experiment decisions, system-level design changes, and iterative development goals were directed by the project author.
+
+AI assistance was primarily used for implementation, debugging, refactoring, and translating design decisions into code.
+
+Project Status
+
+Iron Policy v7 is currently focused on validating its training architecture and experimental mechanisms.
+
+The main priority is controlled experimentation rather than adding additional features.
+
+Current evaluation priorities include:
+
+Multi-seed experiments
+Failure Memory OFF vs ON comparisons
+Checkpoint cross-play
+Behavioral metrics
+Confidence intervals across seeds
+Equal-stat control experiments
+Reload-swap control experiments
+
+Experimental claims should be based on measured results rather than assumed from the architecture alone.
