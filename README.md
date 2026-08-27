@@ -1,8 +1,4 @@
-\*\*Iron Policy v7\*\*
-
-
-\*\*Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator\*\*
-
+# Iron Policy v7
 
 **Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator**
 
@@ -16,49 +12,18 @@ Iron Policy is an experimental AI simulation. It is not intended to model or eva
 
 ## Key Features
 
-\---
+- Two independent PPO agents
+- Synchronized dual-policy co-evolution
+- Different physical characteristics for Leo and T-90
+- Mirrored training and evaluation scenarios
+- Random and scripted baseline agents
+- Checkpoint cross-play evaluation
+- Behavioral analysis and automatic metrics
+- Experimental Failure Memory mechanism
+- Multi-seed experiment support
+- Automated testing with GitHub Actions
 
-
-
-\## Key Features
-
-
-
-\* Two independent PPO agents
-
-\* Synchronized dual-policy co-evolution
-
-\* Different physical characteristics for Leo and T-90
-
-\* Mirrored training and evaluation scenarios
-
-\* Random and scripted baseline agents
-
-\* Checkpoint cross-play evaluation
-
-\* Behavioral analysis and automatic metrics
-
-\* Experimental Failure Memory mechanism
-
-\* Multi-seed experiment support
-
-\* Automated testing with GitHub Actions
-
-
-
-\---
-
-
-
-\## Running on Windows
-
-
-
-1\. Download the repository using \*\*Code → Download ZIP\*\*.
-
-2\. Extract the ZIP into a normal folder.
-
-3\. Run \*\*iron polcy v7.vbs\*\*.
+---
 
 ## Running on Windows
 
@@ -74,17 +39,7 @@ Alternatively, **BASLAT.bat** can be used.
 
 ---
 
-Alternatively, \*\*BASLAT.bat\*\* can be used.
-
-
-
-\---
-
-
-
-\## Running on macOS and Linux
-
-
+## Running on macOS and Linux
 
 Python 3.10–3.13 is required.
 
@@ -98,28 +53,14 @@ KUR.sh is only required during the initial setup or when dependencies change.
 
 ---
 
-
-\---
-
-
-
-\## Training Presets
-
-
+## Training Presets
 
 Iron Policy provides several predefined training phases.
 
-
-
-\* Smoke Test: 16,384 timesteps — 1 seed
-
-\* Behavior Training: 200,000 timesteps — 1 seed
-
-\* Pilot Training: 1,000,000 timesteps per seed — 3 seeds
-
-\* Full Training: 5,000,000 timesteps per seed — 5 seeds
-
-
+- Smoke Test: 16,384 timesteps — 1 seed
+- Behavior Training: 200,000 timesteps — 1 seed
+- Pilot Training: 1,000,000 timesteps per seed — 3 seeds
+- Full Training: 5,000,000 timesteps per seed — 5 seeds
 
 Training parameters remain consistent across systems.
 
@@ -127,48 +68,25 @@ Headless training runs on the CPU and does not require CUDA or an NVIDIA GPU.
 
 ---
 
-
-\---
-
-
-
-\## Checkpoint Cross-Play
-
-
+## Checkpoint Cross-Play
 
 Saved checkpoints are automatically evaluated against each other after training.
 
 A full training run can compare:
 
-
-
-\* 0M
-
-\* 1M
-
-\* 2M
-
-\* 3M
-
-\* 4M
-
-\* final
-
-
+- 0M
+- 1M
+- 2M
+- 3M
+- 4M
+- final
 
 Checkpoint cross-play can help reveal:
 
-
-
-\* Performance regression against older policies
-
-\* Non-transitive policy relationships
-
-\* Behavioral cycles
-
-\* Possible catastrophic forgetting
-
-
+- Performance regression against older policies
+- Non-transitive policy relationships
+- Behavioral cycles
+- Possible catastrophic forgetting
 
 Checkpoint cross-play is an evaluation method only.
 
@@ -176,14 +94,7 @@ The current training architecture uses synchronized co-evolution and should not 
 
 ---
 
-
-\---
-
-
-
-\## Failure Memory
-
-
+## Failure Memory
 
 Failure Memory is an experimental exploration mechanism.
 
@@ -197,14 +108,7 @@ Its effectiveness should only be evaluated through controlled experiments compar
 
 ---
 
-
-\---
-
-
-
-\## Experimental Scope and Limitations
-
-
+## Experimental Scope and Limitations
 
 The observation space contains 23 features.
 
@@ -220,14 +124,7 @@ Older results based on a shared projectile-distance value should not be used for
 
 ---
 
-
-\---
-
-
-
-\## Testing
-
-
+## Testing
 
 Iron Policy includes automated tests for the environment, training system, evaluation pipeline, Failure Memory mechanism, and other core components.
 
@@ -237,14 +134,7 @@ GitHub Actions automatically runs the test suite on Windows and Ubuntu using Pyt
 
 ---
 
-
-\---
-
-
-
-\## Development Note
-
-
+## Development Note
 
 Iron Policy was developed extensively with the assistance of AI coding tools.
 
@@ -254,14 +144,7 @@ AI assistance was primarily used for implementation, debugging, refactoring, and
 
 ---
 
-
-\---
-
-
-
-\## Project Status
-
-
+## Project Status
 
 Iron Policy v7 is currently focused on validating its training architecture and experimental mechanisms.
 
@@ -269,29 +152,12 @@ The main priority is controlled experimentation rather than adding additional fe
 
 Current evaluation priorities include:
 
-
-
-\* Multi-seed experiments
-
-\* Failure Memory OFF vs ON comparisons
-
-\* Checkpoint cross-play
-
-\* Behavioral metrics
-
-\* Confidence intervals across seeds
-
-\* Equal-stat control experiments
-
-\* Reload-swap control experiments
-
-
+- Multi-seed experiments
+- Failure Memory OFF vs ON comparisons
+- Checkpoint cross-play
+- Behavioral metrics
+- Confidence intervals across seeds
+- Equal-stat control experiments
+- Reload-swap control experiments
 
 Experimental claims should be based on measured results rather than assumed from the architecture alone.
-
-
-
-
-
-
-
