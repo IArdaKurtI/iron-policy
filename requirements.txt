@@ -1,0 +1,10 @@
+numpy==2.3.5
+pygame==2.6.1
+gymnasium==1.2.3
+stable-baselines3==2.7.1
+torch==2.10.0
+cloudpickle==3.1.1
+matplotlib==3.10.7
+pytest==8.4.2
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
