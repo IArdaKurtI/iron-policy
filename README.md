@@ -296,7 +296,7 @@ Experimental claims should be based on measured results rather than assumed from
 
 
 
-Bunu README.md’ye yapıştırıp kaydet. Sonra GitHub Desktop’ta \*\*Update README formatting → Commit → Push origin\*\* yeterli.
+
 
 
 
