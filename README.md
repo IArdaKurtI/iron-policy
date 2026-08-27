@@ -1,4 +1,4 @@
-Aynen. Aşağıdaki sürüm mevcut README içeriğini değiştirmeden, sadece GitHub’da düzgün görünecek şekilde biçimlendirilmiş hali.
+
 
 
 
