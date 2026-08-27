@@ -1,8 +1,12 @@
-Iron Policy v7
+Aynen. Aşağıdaki sürüm mevcut README içeriğini değiştirmeden, sadece GitHub’da düzgün görünecek şekilde biçimlendirilmiş hali.
 
 
 
-Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator
+\# Iron Policy v7
+
+
+
+\*\*Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator\*\*
 
 
 
@@ -18,35 +22,49 @@ Iron Policy is an experimental AI simulation. It is not intended to model or eva
 
 
 
-Key Features
+\---
 
-Two independent PPO agents
 
-Synchronized dual-policy co-evolution
 
-Different physical characteristics for Leo and T-90
+\## Key Features
 
-Mirrored training and evaluation scenarios
 
-Random and scripted baseline agents
 
-Checkpoint cross-play evaluation
+\* Two independent PPO agents
 
-Behavioral analysis and automatic metrics
+\* Synchronized dual-policy co-evolution
 
-Experimental Failure Memory mechanism
+\* Different physical characteristics for Leo and T-90
 
-Multi-seed experiment support
+\* Mirrored training and evaluation scenarios
 
-Automated testing with GitHub Actions
+\* Random and scripted baseline agents
 
-Running on Windows
+\* Checkpoint cross-play evaluation
 
-Download the repository using Code → Download ZIP.
+\* Behavioral analysis and automatic metrics
 
-Extract the ZIP into a normal folder.
+\* Experimental Failure Memory mechanism
 
-Run iron polcy v7.vbs.
+\* Multi-seed experiment support
+
+\* Automated testing with GitHub Actions
+
+
+
+\---
+
+
+
+\## Running on Windows
+
+
+
+1\. Download the repository using \*\*Code → Download ZIP\*\*.
+
+2\. Extract the ZIP into a normal folder.
+
+3\. Run \*\*iron polcy v7.vbs\*\*.
 
 
 
@@ -58,11 +76,15 @@ Python 3.10–3.13 must be installed.
 
 
 
-Alternatively, BASLAT.bat can be used.
+Alternatively, \*\*BASLAT.bat\*\* can be used.
 
 
 
-Running on macOS and Linux
+\---
+
+
+
+\## Running on macOS and Linux
 
 
 
@@ -86,7 +108,11 @@ KUR.sh is only required during the initial setup or when dependencies change.
 
 
 
-Training Presets
+\---
+
+
+
+\## Training Presets
 
 
 
@@ -94,13 +120,13 @@ Iron Policy provides several predefined training phases.
 
 
 
-Smoke Test: 16,384 timesteps — 1 seed
+\* Smoke Test: 16,384 timesteps — 1 seed
 
-Behavior Training: 200,000 timesteps — 1 seed
+\* Behavior Training: 200,000 timesteps — 1 seed
 
-Pilot Training: 1,000,000 timesteps per seed — 3 seeds
+\* Pilot Training: 1,000,000 timesteps per seed — 3 seeds
 
-Full Training: 5,000,000 timesteps per seed — 5 seeds
+\* Full Training: 5,000,000 timesteps per seed — 5 seeds
 
 
 
@@ -112,7 +138,11 @@ Headless training runs on the CPU and does not require CUDA or an NVIDIA GPU.
 
 
 
-Checkpoint Cross-Play
+\---
+
+
+
+\## Checkpoint Cross-Play
 
 
 
@@ -124,17 +154,17 @@ A full training run can compare:
 
 
 
-0M
+\* 0M
 
-1M
+\* 1M
 
-2M
+\* 2M
 
-3M
+\* 3M
 
-4M
+\* 4M
 
-final
+\* final
 
 
 
@@ -142,13 +172,13 @@ Checkpoint cross-play can help reveal:
 
 
 
-Performance regression against older policies
+\* Performance regression against older policies
 
-Non-transitive policy relationships
+\* Non-transitive policy relationships
 
-Behavioral cycles
+\* Behavioral cycles
 
-Possible catastrophic forgetting
+\* Possible catastrophic forgetting
 
 
 
@@ -160,7 +190,11 @@ The current training architecture uses synchronized co-evolution and should not 
 
 
 
-Failure Memory
+\---
+
+
+
+\## Failure Memory
 
 
 
@@ -184,7 +218,11 @@ Its effectiveness should only be evaluated through controlled experiments compar
 
 
 
-Experimental Scope and Limitations
+\---
+
+
+
+\## Experimental Scope and Limitations
 
 
 
@@ -212,7 +250,11 @@ Older results based on a shared projectile-distance value should not be used for
 
 
 
-Testing
+\---
+
+
+
+\## Testing
 
 
 
@@ -228,7 +270,11 @@ GitHub Actions automatically runs the test suite on Windows and Ubuntu using Pyt
 
 
 
-Development Note
+\---
+
+
+
+\## Development Note
 
 
 
@@ -244,7 +290,11 @@ AI assistance was primarily used for implementation, debugging, refactoring, and
 
 
 
-Project Status
+\---
+
+
+
+\## Project Status
 
 
 
@@ -260,21 +310,27 @@ Current evaluation priorities include:
 
 
 
-Multi-seed experiments
+\* Multi-seed experiments
 
-Failure Memory OFF vs ON comparisons
+\* Failure Memory OFF vs ON comparisons
 
-Checkpoint cross-play
+\* Checkpoint cross-play
 
-Behavioral metrics
+\* Behavioral metrics
 
-Confidence intervals across seeds
+\* Confidence intervals across seeds
 
-Equal-stat control experiments
+\* Equal-stat control experiments
 
-Reload-swap control experiments
+\* Reload-swap control experiments
 
 
 
 Experimental claims should be based on measured results rather than assumed from the architecture alone.
+
+
+
+Bunu README.md’ye yapıştırıp kaydet. Sonra GitHub Desktop’ta \*\*Update README formatting → Commit → Push origin\*\* yeterli.
+
+
 
