@@ -9,18 +9,17 @@ Aynen. Aşağıdaki sürüm mevcut README içeriğini değiştirmeden, sadece Gi
 \*\*Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator\*\*
 
 
+**Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator**
 
 Iron Policy v7 is a two-dimensional reinforcement learning simulation in which two AI-controlled tanks, Leo and T-90, learn while competing against each other in the same environment.
 
-
-
 The project includes two independent PPO policies, synchronized co-evolution, mirrored evaluation, checkpoint cross-play, behavioral analysis, and an experimental Failure Memory mechanism.
-
-
 
 Iron Policy is an experimental AI simulation. It is not intended to model or evaluate real-world weapon systems.
 
+---
 
+## Key Features
 
 \---
 
@@ -66,15 +65,19 @@ Iron Policy is an experimental AI simulation. It is not intended to model or eva
 
 3\. Run \*\*iron polcy v7.vbs\*\*.
 
+## Running on Windows
 
+1. Download the repository using **Code → Download ZIP**.
+2. Extract the ZIP into a normal folder.
+3. Run **iron polcy v7.vbs**.
 
 The required packages are installed automatically during the first launch.
 
-
-
 Python 3.10–3.13 must be installed.
 
+Alternatively, **BASLAT.bat** can be used.
 
+---
 
 Alternatively, \*\*BASLAT.bat\*\* can be used.
 
@@ -90,22 +93,15 @@ Alternatively, \*\*BASLAT.bat\*\* can be used.
 
 Python 3.10–3.13 is required.
 
-
-
 Run:
-
-
 
 sh KUR.sh
 
-
-
 sh BASLAT.sh
-
-
 
 KUR.sh is only required during the initial setup or when dependencies change.
 
+---
 
 
 \---
@@ -132,10 +128,9 @@ Iron Policy provides several predefined training phases.
 
 Training parameters remain consistent across systems.
 
-
-
 Headless training runs on the CPU and does not require CUDA or an NVIDIA GPU.
 
+---
 
 
 \---
@@ -147,8 +142,6 @@ Headless training runs on the CPU and does not require CUDA or an NVIDIA GPU.
 
 
 Saved checkpoints are automatically evaluated against each other after training.
-
-
 
 A full training run can compare:
 
@@ -184,10 +177,9 @@ Checkpoint cross-play can help reveal:
 
 Checkpoint cross-play is an evaluation method only.
 
-
-
 The current training architecture uses synchronized co-evolution and should not be described as historical or league-based self-play.
 
+---
 
 
 \---
@@ -200,22 +192,15 @@ The current training architecture uses synchronized co-evolution and should not 
 
 Failure Memory is an experimental exploration mechanism.
 
-
-
 When an agent enters a state similar to previously recorded failure states, the local entropy multiplier can be increased to encourage additional exploration.
-
-
 
 Failure Memory does not directly modify the reward.
 
-
-
 The mechanism is disabled by default.
-
-
 
 Its effectiveness should only be evaluated through controlled experiments comparing Failure Memory OFF and ON under the same seeds and training conditions.
 
+---
 
 
 \---
@@ -228,26 +213,17 @@ Its effectiveness should only be evaluated through controlled experiments compar
 
 The observation space contains 23 features.
 
-
-
 Each agent observes information about the nearest hostile projectile, while additional simultaneous projectiles are not directly represented.
-
-
 
 The environment can therefore be considered partially observable from the agent's perspective.
 
-
-
 The main reward profile is minimal. A separate shaped profile is retained for comparison and ablation experiments.
-
-
 
 Projectile evasion measurements in new trajectory records use separate projectile distances for Leo and T-90.
 
-
-
 Older results based on a shared projectile-distance value should not be used for scientific comparison.
 
+---
 
 
 \---
@@ -260,14 +236,11 @@ Older results based on a shared projectile-distance value should not be used for
 
 Iron Policy includes automated tests for the environment, training system, evaluation pipeline, Failure Memory mechanism, and other core components.
 
-
-
 Tests are built with pytest.
-
-
 
 GitHub Actions automatically runs the test suite on Windows and Ubuntu using Python 3.12 and 3.13 when changes are pushed to the repository.
 
+---
 
 
 \---
@@ -280,14 +253,11 @@ GitHub Actions automatically runs the test suite on Windows and Ubuntu using Pyt
 
 Iron Policy was developed extensively with the assistance of AI coding tools.
 
-
-
 The project direction, behavioral observations, experiment decisions, system-level design changes, and iterative development goals were directed by the project author.
-
-
 
 AI assistance was primarily used for implementation, debugging, refactoring, and translating design decisions into code.
 
+---
 
 
 \---
@@ -300,11 +270,7 @@ AI assistance was primarily used for implementation, debugging, refactoring, and
 
 Iron Policy v7 is currently focused on validating its training architecture and experimental mechanisms.
 
-
-
 The main priority is controlled experimentation rather than adding additional features.
-
-
 
 Current evaluation priorities include:
 
