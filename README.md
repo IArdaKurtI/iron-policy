@@ -1,9 +1,4 @@
-
-
-
-
 \# Iron Policy v7
-
 
 
 \*\*Multi-Agent Reinforcement Learning Tank Co-Evolution Simulator\*\*
