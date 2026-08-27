@@ -129,7 +129,3 @@ eğitim sırasındaki rakip havuzuna da katılması gerekir.
   ajana birden verildiği için yalnızca karşılaştırma/ablation amacıyla tutulur.
 - Mevcut eğitim eşzamanlı co-evolution'dır; historical self-play değildir.
 
-## Not
-
-Bu proje gerçek tank veya silah sistemi testi değildir. Deneysel bir yapay zekâ
-simülasyonudur.
