@@ -100,6 +100,7 @@ ENGLISH_TEXT = {
     "Yarım kaldı": "Incomplete",
     "Başlatıldı": "Started",
     "Aç": "Open",
+    "İzle": "Watch",
     "Sil": "Delete",
     "Önceki": "Previous",
     "Sonraki": "Next",
@@ -143,6 +144,7 @@ ENGLISH_TEXT = {
     "Varsa yarım kalan dosyalar eğitim kayıtlarından görülebilir.": "Any partial files can be viewed in training records.",
     "Son eğitilen modelleri izle": "Watch latest trained models",
     "ESC: ana menü": "ESC: main menu",
+    "ESC: eğitim kayıtları": "ESC: training records",
     "Çıkış onayı": "Confirm exit",
     "Eğitim şu anda devam ediyor.": "Training is currently running.",
     "Çıkarsanız eğitim durdurulacak ve arkada çalışmayacak.": "If you exit, training will stop and will not continue in the background.",
@@ -159,6 +161,7 @@ ENGLISH_TEXT = {
     "Berabere": "Draw",
     "Maç tamamlandı": "Match completed",
     "Maçtan ana menüye dönüldü.": "Returned to the main menu from the match.",
+    "Maçtan eğitim kayıtlarına dönüldü.": "Returned to training records from the match.",
     "Dil değiştirildi ancak tercih kaydedilemedi.": "Language changed, but the preference could not be saved.",
     "Sayfa {current} / {total}": "Page {current} / {total}",
     "{completed:,} / {total:,} adım • {size}": "{completed:,} / {total:,} steps • {size}",
@@ -184,6 +187,7 @@ ENGLISH_TEXT = {
     "Program testleri başlatıldı.": "Program tests started.",
     "Test başlatılamadı: {error}": "The test could not be started: {error}",
     "İzlenecek model bulunamadı. Önce bir eğitim tamamlayın.": "No model is available to watch. Complete a training run first.",
+    "Bu eğitim kaydında izlenebilir final model bulunamadı.": "No watchable final model was found in this training record.",
     "Modeller açılamadı: {error}": "Models could not be opened: {error}",
 }
 
@@ -587,6 +591,13 @@ def count_training_records() -> int:
     return sum(1 for path in RUNS_ROOT.glob("*/*/*/seed_*") if path.is_dir())
 
 
+def training_record_model_pair(record: TrainingRecord) -> tuple[Path, Path] | None:
+    models = record.path / "models"
+    leo = models / "leo_final_v7.zip"
+    t90 = models / "t90_final_v7.zip"
+    return (leo, t90) if leo.is_file() and t90.is_file() else None
+
+
 def _unique_trash_target(directory: Path, name: str) -> Path:
     candidate = directory / name
     counter = 1
@@ -706,6 +717,8 @@ class TankLauncher:
         self.match_seed = 100_000
         self.match_number = 0
         self.match_label = ""
+        self.match_record: TrainingRecord | None = None
+        self.match_return_state = "main"
         self.match_result = ""
         self.result_frames = 0
         self.world_surface = pygame.Surface((800, 600))
@@ -895,14 +908,21 @@ class TankLauncher:
                 self.TEXT,
                 self.tiny,
             )
-            self.text(date_text, (515, y + 12), self.TEXT, self.tiny)
+            self.text(date_text, (515, y + 9), self.TEXT, self.tiny)
+            pair_available = training_record_model_pair(record) is not None
             self.compact_button(
-                (665, y + 25, 80, 38),
+                (620, y + 38, 65, 34),
                 "Aç",
                 lambda record=record: self.open_record_folder(record),
             )
             self.compact_button(
-                (755, y + 25, 80, 38),
+                (690, y + 38, 65, 34),
+                "İzle",
+                lambda record=record: self.start_record_match(record),
+                pair_available and not active,
+            )
+            self.compact_button(
+                (760, y + 38, 65, 34),
                 "Sil",
                 lambda record=record: self.request_delete_record(record),
                 not active,
@@ -1171,8 +1191,15 @@ class TankLauncher:
         self.match_env._draw_world(self.world_surface)
         self.screen.blit(self.world_surface, WORLD_OFFSET)
         pygame.draw.rect(self.screen, (10, 15, 21), (50, 618, 800, 64))
-        self.text(self.match_label, (68, 630), self.TEXT, self.small)
-        self.text("ESC: ana menü", (690, 630), self.MUTED, self.small)
+        match_label = self.match_label
+        if self.match_record is not None:
+            phase_label = self.t(
+                PHASE_LABELS.get(self.match_record.phase, self.match_record.phase)
+            ).split("—")[0].strip()
+            match_label = f"{phase_label} • seed {self.match_record.seed}"
+        self.text(match_label, (68, 630), self.TEXT, self.small)
+        escape_label = "ESC: eğitim kayıtları" if self.match_return_state == "records" else "ESC: ana menü"
+        self.text(escape_label, (630, 630), self.MUTED, self.small)
         result = self.match_result or self.tf(
             "Maç {match} • adım {step}",
             match=self.match_number + 1,
@@ -1360,6 +1387,29 @@ class TankLauncher:
             self.message_color = self.RED
             self.state = "main"
             return
+        self._start_model_pair(
+            pair,
+            "Son eğitim" if latest else "Hazır modeller",
+            return_state="main",
+        )
+
+    def start_record_match(self, record: TrainingRecord) -> None:
+        pair = training_record_model_pair(record)
+        if pair is None:
+            self.message = "Bu eğitim kaydında izlenebilir final model bulunamadı."
+            self.message_color = self.RED
+            self.state = "records"
+            return
+        self._start_model_pair(pair, "", return_state="records", record=record)
+
+    def _start_model_pair(
+        self,
+        pair: tuple[Path, Path],
+        label: str,
+        *,
+        return_state: str,
+        record: TrainingRecord | None = None,
+    ) -> None:
         self.screen.fill(self.BG)
         self.centered("Modeller yükleniyor…", 315, self.TEXT, self.font)
         pygame.display.flip()
@@ -1370,14 +1420,16 @@ class TankLauncher:
             self.match_number = 0
             self.match_result = ""
             self.result_frames = 0
-            self.match_label = "Son eğitim" if latest else "Hazır modeller"
+            self.match_label = label
+            self.match_record = record
+            self.match_return_state = return_state
             self.reset_match()
             self.state = "match"
         except Exception as exc:
             self.close_match()
             self.message = self.tf("Modeller açılamadı: {error}", error=exc)
             self.message_color = self.RED
-            self.state = "main"
+            self.state = return_state
 
     def reset_match(self) -> None:
         assert self.match_env is not None
@@ -1425,6 +1477,7 @@ class TankLauncher:
         self.t90_agent = None
         self.leo_obs = None
         self.t90_obs = None
+        self.match_record = None
 
     def request_exit(self) -> None:
         if self.job_running():
@@ -1458,9 +1511,14 @@ class TankLauncher:
                         if self.state == "language":
                             continue
                         if self.state == "match":
+                            return_state = self.match_return_state
                             self.close_match()
-                            self.state = "main"
-                            self.message = "Maçtan ana menüye dönüldü."
+                            self.state = return_state
+                            self.message = (
+                                "Maçtan eğitim kayıtlarına dönüldü."
+                                if return_state == "records"
+                                else "Maçtan ana menüye dönüldü."
+                            )
                             self.message_color = self.MUTED
                         elif self.state == "confirm_delete":
                             self.cancel_delete_record()

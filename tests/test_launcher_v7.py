@@ -153,6 +153,7 @@ def test_english_translation_covers_menu_and_training_labels() -> None:
         "Full training — 5 × 5M steps"
     )
     assert launcher_v7.translated("en", "Eğitim kayıtları") == "Training records"
+    assert launcher_v7.translated("en", "İzle") == "Watch"
     assert launcher_v7.translated("tr", "Eğitim kayıtları") == "Eğitim kayıtları"
 
 
@@ -174,3 +175,69 @@ def test_first_language_choice_is_persisted_and_opens_main_menu(monkeypatch) -> 
     assert launcher.language == "en"
     assert launcher.state == "main"
     assert launcher.current_status() == "Ready. Choose an option."
+
+
+def _training_record(path, *, phase="full", seed=10) -> launcher_v7.TrainingRecord:
+    return launcher_v7.TrainingRecord(
+        path=path,
+        phase=phase,
+        seed=seed,
+        completed_steps=5_000_000,
+        total_steps=5_000_000,
+        size_bytes=123,
+        modified=0.0,
+        status="Tamamlandı",
+    )
+
+
+def test_training_record_model_pair_requires_both_final_models(tmp_path) -> None:
+    record = _training_record(tmp_path / "seed_10")
+    models = record.path / "models"
+    models.mkdir(parents=True)
+
+    assert launcher_v7.training_record_model_pair(record) is None
+    (models / "leo_final_v7.zip").write_bytes(b"leo")
+    assert launcher_v7.training_record_model_pair(record) is None
+    (models / "t90_final_v7.zip").write_bytes(b"t90")
+
+    assert launcher_v7.training_record_model_pair(record) == (
+        models / "leo_final_v7.zip",
+        models / "t90_final_v7.zip",
+    )
+
+
+def test_watch_training_record_uses_the_selected_seed_models(tmp_path) -> None:
+    record = _training_record(tmp_path / "seed_40", phase="pilot", seed=40)
+    models = record.path / "models"
+    models.mkdir(parents=True)
+    (models / "leo_final_v7.zip").write_bytes(b"leo")
+    (models / "t90_final_v7.zip").write_bytes(b"t90")
+    launcher = launcher_v7.TankLauncher.__new__(launcher_v7.TankLauncher)
+    captured: dict[str, object] = {}
+
+    def fake_start(pair, label, **kwargs):
+        captured.update(pair=pair, label=label, **kwargs)
+
+    launcher._start_model_pair = fake_start
+    launcher.start_record_match(record)
+
+    assert captured == {
+        "pair": (models / "leo_final_v7.zip", models / "t90_final_v7.zip"),
+        "label": "",
+        "return_state": "records",
+        "record": record,
+    }
+
+
+def test_watch_incomplete_training_record_shows_clear_message(tmp_path) -> None:
+    record = _training_record(tmp_path / "seed_10")
+    launcher = launcher_v7.TankLauncher.__new__(launcher_v7.TankLauncher)
+    launcher.message = ""
+    launcher.message_color = launcher_v7.TankLauncher.MUTED
+    launcher.state = "records"
+
+    launcher.start_record_match(record)
+
+    assert launcher.state == "records"
+    assert launcher.message == "Bu eğitim kaydında izlenebilir final model bulunamadı."
+    assert launcher.message_color == launcher_v7.TankLauncher.RED
